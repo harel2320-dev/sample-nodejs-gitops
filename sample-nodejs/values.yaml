@@ -1,6 +1,6 @@
 image:
   repository: 027401589554.dkr.ecr.il-central-1.amazonaws.com/sample-nodejs
-  tag: "574d42af9afff77f34d27575bad5b105e4108d68"
+  tag: "8cd3d50ad5ca053398c706853578a2dc2025db2e"
 
 ingress:
   host: sample-nodejs.catsweather.online
