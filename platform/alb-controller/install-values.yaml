@@ -1,0 +1,37 @@
+# Prefers (not requires) the dedicated "platform" node group - unlike
+# ArgoCD, this controller's privilege scope is narrower (ALB/SG/target-
+# group IAM only, no cluster-wide apply rights or git credentials), and
+# losing all Ingress reconciliation if the single platform node is ever
+# unavailable is a bigger practical risk than the isolation benefit.
+# Toleration allows scheduling there; affinity prefers it; no
+# nodeSelector, so it falls back to the app node group if needed.
+clusterName: sample-nodejs
+
+# vpcId intentionally not set here - passed at install/upgrade time via
+# `--set vpcId=$(terraform output -raw vpc_id)` instead of hardcoded, so
+# it can never drift from the real VPC. Explicit (not auto-detected via
+# instance metadata) because the node's IMDS hop limit is deliberately
+# set to 1 (pods can't reach it) - raising it to 2 would let any pod on
+# the node query IMDS, reopening the SSRF-to-credential-theft path Pod
+# Identity was chosen to avoid.
+
+serviceAccount:
+  create: true
+  name: aws-load-balancer-controller # must match terraform/main/alb-controller.tf's Pod Identity association (in sample-nodejs repo)
+
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Equal
+    value: "true"
+    effect: NoSchedule
+
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+            - key: role
+              operator: In
+              values:
+                - platform

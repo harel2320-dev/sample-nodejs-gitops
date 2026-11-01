@@ -1,0 +1,46 @@
+replicaCount: 2
+
+image:
+  repository: 027401589554.dkr.ecr.il-central-1.amazonaws.com/sample-nodejs
+  tag: ""   # CI overwrites this on every push to main
+  pullPolicy: IfNotPresent
+
+namespace: sample-nodejs
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  className: alb
+  host: sample-nodejs.catsweather.online
+  certificateArn: arn:aws:acm:il-central-1:027401589554:certificate/4e53b266-1c94-40c8-a810-2e048b9b4cef
+  paths:
+    - path: /my-app
+      pathType: Prefix
+    - path: /about
+      pathType: Prefix
+
+config:
+  port: "8080"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+probes:
+  readiness:
+    path: /ready
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+  liveness:
+    path: /live
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3

@@ -1,7 +1,0 @@
-image:
-  repository: 027401589554.dkr.ecr.il-central-1.amazonaws.com/sample-nodejs
-  tag: "315bc1cec7c8c88006a6447da127c1bea7c203b4"
-
-ingress:
-  host: sample-nodejs.catsweather.online
-  certificateArn: arn:aws:acm:il-central-1:027401589554:certificate/4e53b266-1c94-40c8-a810-2e048b9b4cef

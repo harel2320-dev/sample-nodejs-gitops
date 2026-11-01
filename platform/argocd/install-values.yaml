@@ -1,0 +1,13 @@
+# Pins all ArgoCD components onto the dedicated, tainted "platform" node
+# group - keeps ArgoCD's cluster-wide, high-privilege RBAC off the same
+# node as the app workload. See terraform/main/eks.tf and
+# docs/terraform-execution-permission-set.json in the sample-nodejs repo
+# for the node group and IAM side.
+global:
+  nodeSelector:
+    role: platform
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
