@@ -16,12 +16,12 @@ spec:
       labels:
         {{- include "sample-nodejs.labels" . | nindent 8 }}
     spec:
-      # Pod-level hardening: refuse to run as root, pin to the Dockerfile's
-      # distroless nonroot uid (65532), and apply the default seccomp
-      # syscall filter.
+      # Pod-level hardening: refuse to run as root (enforced against the
+      # image's own USER - the Dockerfile's distroless nonroot uid - so
+      # there's no uid duplicated here to drift out of sync), and apply
+      # the default seccomp syscall filter.
       securityContext:
         runAsNonRoot: true
-        runAsUser: 65532
         seccompProfile:
           type: RuntimeDefault
       containers:
