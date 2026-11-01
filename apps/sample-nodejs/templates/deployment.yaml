@@ -16,11 +16,12 @@ spec:
       labels:
         {{- include "sample-nodejs.labels" . | nindent 8 }}
     spec:
-      # Pod-level hardening: refuse to run as root, pin to the Dockerfile's
-      # "node" uid, and apply the default seccomp syscall filter.
+      # Pod-level hardening: refuse to run as root (enforced against the
+      # image's own USER - the Dockerfile's distroless nonroot uid - so
+      # there's no uid duplicated here to drift out of sync), and apply
+      # the default seccomp syscall filter.
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1000
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -33,7 +34,7 @@ spec:
             - configMapRef:
                 name: {{ include "sample-nodejs.fullname" . }}
           # Container-level hardening, verified against the built image
-          # (docker run --read-only) before being set here — see DECISIONS.md.
+          # (docker run --read-only) before being set here.
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
